@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaDownload,
   FaCalendarAlt,
@@ -8,6 +9,8 @@ import {
 import manager from "../assets/manager.png";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   const crop = {
     name: "Sugarcane",
     duration: "6 months",
@@ -27,6 +30,18 @@ const Dashboard = () => {
     { name: "Seed purchase", company: "AgroCo", date: "15/05" },
     { name: "Pesticide", company: "GreenShield", date: "22/05" },
   ];
+
+  // Logout function
+  const handleLogout = () => {
+    // Remove auth token from localStorage
+    localStorage.removeItem("token");
+
+    // Any other cleanup like removing user data, etc.
+    localStorage.removeItem("user");
+
+    // Redirect to login page
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen font-sans">
@@ -49,7 +64,9 @@ const Dashboard = () => {
             <button className="bg-white text-black w-4/5 py-2 rounded">
               Dashboard
             </button>
-            <button className="hover:underline w-4/5 text-center">
+            <button
+            onClick={() => navigate("/budget")}
+            className="hover:underline w-4/5 text-center">
               Budget Planner
             </button>
             <button className="hover:underline w-4/5 text-center">
@@ -65,7 +82,10 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <button className="bg-white text-black py-2 rounded w-4/5 text-center">
+        <button
+          onClick={handleLogout}
+          className="bg-white text-black py-2 rounded w-4/5 text-center"
+        >
           Logout
         </button>
       </aside>
