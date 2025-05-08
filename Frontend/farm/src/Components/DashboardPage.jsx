@@ -5,7 +5,7 @@ import {
   FaLeaf,
   FaRulerCombined,
 } from "react-icons/fa";
-import manager from "../assets/manager.png";
+ import manager from "../assets/manager.png";
 
 const Dashboard = () => {
   const crop = {
