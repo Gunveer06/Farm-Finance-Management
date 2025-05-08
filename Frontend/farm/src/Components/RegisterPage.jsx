@@ -17,7 +17,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!username || !password || !confirmPassword) {
       alert("Please fill in all fields.");
       return;
@@ -28,12 +28,27 @@ const RegisterPage = () => {
       return;
     }
 
-    // Future: Send data to backend API here
-    console.log("Registered with:", { username, password });
+    try {
+      const response = await fetch("http://localhost:8080/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    // Simulate successful registration and redirect
-    navigate("/login");
+      const result = await response.text();
+      alert(result); // Shows server message (success or already exists)
+
+      if (response.ok) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert("Registration failed. Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-green-900 flex flex-col">
