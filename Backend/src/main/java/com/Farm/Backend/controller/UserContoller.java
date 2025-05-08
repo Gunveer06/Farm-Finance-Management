@@ -1,4 +1,4 @@
-package com.Farm.Backend.contoller;
+package com.Farm.Backend.controller;
 
 import com.Farm.Backend.DTO.RegisterRequest;
 import com.Farm.Backend.service.Register.SignInService;
