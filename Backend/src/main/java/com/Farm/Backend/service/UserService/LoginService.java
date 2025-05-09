@@ -1,8 +1,9 @@
 // LoginService.java
-package com.Farm.Backend.service.Register;
+package com.Farm.Backend.service.UserService;
 
 import com.Farm.Backend.entity.Users;
 import com.Farm.Backend.repo.LoginRepo;
+import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,11 @@ public class LoginService {
         } else {
             return "Invalid username or password!";
         }
+    }
+    public Users getUserByUsername(String username){
+       return loginRepository.findByUsername(username);
+    }
+    public Users getUserById(Long id) {
+        return loginRepository.findById(Math.toIntExact(id)).orElse(null);
     }
 }

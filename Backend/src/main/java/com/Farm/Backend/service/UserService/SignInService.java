@@ -1,4 +1,4 @@
-package com.Farm.Backend.service.Register;
+package com.Farm.Backend.service.UserService;
 
 import com.Farm.Backend.entity.Users;
 import com.Farm.Backend.repo.UsersRepo;
@@ -26,8 +26,7 @@ public class SignInService {
         Users savedUser = usersRepo.save(newUser);
 
         // Return or log saved user details
-        return "User registered: ID = " + savedUser.getUser_id() +
-                ", Username = " + savedUser.getUsername();
+        return "User registered";
     }
 }
 

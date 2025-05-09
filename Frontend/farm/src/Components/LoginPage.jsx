@@ -16,18 +16,36 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       alert("Please enter both username and password.");
       return;
     }
 
-    // Simulate login success (replace with real authentication)
-    console.log("Logging in with:", { username, password });
+    try {
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",  // Important!
+        body: JSON.stringify({ username, password }),
+      });
 
-    // Redirect to dashboard/home after login
-    navigate("/dashboard");
+      const resultText = await response.text();
+      console.log("Login response:", resultText);
+
+      if (resultText === "Login successful!") {
+        navigate("/dashboard");
+      } else {
+        alert(resultText);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-green-900 flex flex-col">

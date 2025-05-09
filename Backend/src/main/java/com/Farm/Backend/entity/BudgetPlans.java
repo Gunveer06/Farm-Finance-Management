@@ -1,53 +1,61 @@
 package com.Farm.Backend.entity;
 
 import jakarta.persistence.*;
-import org.springframework.boot.autoconfigure.web.WebProperties;
-
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Entity
+@Table(name = "budget_plans")
 public class BudgetPlans {
+
     @Id
+    @Column(name = "plan_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int plan_id ;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private Users user_id ;
+    private Integer planId;
 
-    private String crop_name ;
+    @Column(name = "crop_name")
+    private String cropName;
 
-    private String season ;
+    @Column(name = "season")
+    private String season;
 
-    private float cost ;
+    @Column(name = "estimated_cost")
+    private BigDecimal cost;
 
-    private LocalDate Date ;
+    @Column(name = "plan_date")
+    private LocalDate date;
 
-    public BudgetPlans(int plan_id, Users user_id, String crop_name, String season, float cost, LocalDate date) {
-        this.plan_id = plan_id;
-        this.user_id = user_id;
-        this.crop_name = crop_name;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+
+    public BudgetPlans() {
+    }
+
+    public BudgetPlans(Integer planId, String cropName, String season, BigDecimal cost, LocalDate date, Users user) {
+        this.planId = planId;
+        this.cropName = cropName;
         this.season = season;
         this.cost = cost;
-        Date = date;
-    }
-    public BudgetPlans(){
-
-    };
-
-    public LocalDate getDate() {
-        return Date;
+        this.date = date;
+        this.user = user;
     }
 
-    public void setDate(LocalDate date) {
-        Date = date;
+    public Integer getPlanId() {
+        return planId;
     }
 
-    public float getCost() {
-        return cost;
+    public void setPlanId(Integer planId) {
+        this.planId = planId;
     }
 
-    public void setCost(float cost) {
-        this.cost = cost;
+    public String getCropName() {
+        return cropName;
+    }
+
+    public void setCropName(String cropName) {
+        this.cropName = cropName;
     }
 
     public String getSeason() {
@@ -58,27 +66,27 @@ public class BudgetPlans {
         this.season = season;
     }
 
-    public String getCrop_name() {
-        return crop_name;
+    public BigDecimal getCost() {
+        return cost;
     }
 
-    public void setCrop_name(String crop_name) {
-        this.crop_name = crop_name;
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 
-    public Users getUser_id() {
-        return user_id;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setUser_id(Users user_id) {
-        this.user_id = user_id;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public int getPlan_id() {
-        return plan_id;
+    public Users getUser() {
+        return user;
     }
 
-    public void setPlan_id(int plan_id) {
-        this.plan_id = plan_id;
+    public void setUser(Users user) {
+        this.user = user;
     }
 }
