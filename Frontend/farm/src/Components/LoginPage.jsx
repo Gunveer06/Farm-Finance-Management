@@ -28,18 +28,18 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",  // Important!
         body: JSON.stringify({ username, password }),
       });
 
       const resultText = await response.text();
+      console.log("Login response:", resultText);
 
       if (resultText === "Login successful!") {
-        console.log("Login successful");
         navigate("/dashboard");
       } else {
-        alert(resultText); // Show error from backend
+        alert(resultText);
       }
-
     } catch (error) {
       console.error("Login error:", error);
       alert("An error occurred. Please try again.");

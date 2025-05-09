@@ -1,35 +1,44 @@
 package com.Farm.Backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.Set;
 
 @Entity
+@Table(name="Users")
 public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_id;
+    @Column(name = "user_id", columnDefinition = "BIGINT")
+    private Long userId;
 
+
+    @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
-    public Users(){};
+    // Optional: bidirectional relationship with BudgetPlan
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<BudgetPlans> budgetPlans;
 
-    public Users(int user_id, String username, String password) {
-        this.user_id = user_id;
+    public Users() {}
+
+    public Users(Long userId, String username, String password) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
     }
 
-    public int getUser_id() {
-        return user_id;
+    // Getters and Setters
+
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -46,5 +55,13 @@ public class Users {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<BudgetPlans> getBudgetPlans() {
+        return budgetPlans;
+    }
+
+    public void setBudgetPlans(Set<BudgetPlans> budgetPlans) {
+        this.budgetPlans = budgetPlans;
     }
 }
