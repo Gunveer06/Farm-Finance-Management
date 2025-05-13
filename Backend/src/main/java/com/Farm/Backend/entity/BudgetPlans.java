@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public class BudgetPlans {
 
     @Id
-    @Column(name = "plan_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "plan_id")
     private Integer planId;
 
     @Column(name = "crop_name")
@@ -29,9 +29,7 @@ public class BudgetPlans {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-
-    public BudgetPlans() {
-    }
+    public BudgetPlans() {}
 
     public BudgetPlans(Integer planId, String cropName, String season, BigDecimal cost, LocalDate date, Users user) {
         this.planId = planId;
@@ -42,51 +40,16 @@ public class BudgetPlans {
         this.user = user;
     }
 
-    public Integer getPlanId() {
-        return planId;
-    }
-
-    public void setPlanId(Integer planId) {
-        this.planId = planId;
-    }
-
-    public String getCropName() {
-        return cropName;
-    }
-
-    public void setCropName(String cropName) {
-        this.cropName = cropName;
-    }
-
-    public String getSeason() {
-        return season;
-    }
-
-    public void setSeason(String season) {
-        this.season = season;
-    }
-
-    public BigDecimal getCost() {
-        return cost;
-    }
-
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
+    public Integer getPlanId() { return planId; }
+    public void setPlanId(Integer planId) { this.planId = planId; }
+    public String getCropName() { return cropName; }
+    public void setCropName(String cropName) { this.cropName = cropName; }
+    public String getSeason() { return season; }
+    public void setSeason(String season) { this.season = season; }
+    public BigDecimal getCost() { return cost; }
+    public void setCost(BigDecimal cost) { this.cost = cost; }
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+    public Users getUser() { return user; }
+    public void setUser(Users user) { this.user = user; }
 }

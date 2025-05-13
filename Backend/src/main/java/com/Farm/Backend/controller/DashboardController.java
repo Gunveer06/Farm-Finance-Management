@@ -25,17 +25,12 @@ public class DashboardController {
 
     @GetMapping("/getUserData")
     public ResponseEntity<?> getUserData(HttpSession session) {
-        System.out.println("GETUSERDATA SESSION ID: " + session.getId());
-        System.out.println("Session userId attribute: " + session.getAttribute("userId"));
-
         Object userIdObj = session.getAttribute("userId");
-
         if (userIdObj == null) {
             return ResponseEntity.status(401).body("User not logged in");
         }
 
         Long userId;
-
         if (userIdObj instanceof Integer) {
             userId = ((Integer) userIdObj).longValue();
         } else if (userIdObj instanceof Long) {

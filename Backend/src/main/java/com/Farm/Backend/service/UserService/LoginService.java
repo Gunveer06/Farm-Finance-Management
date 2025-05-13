@@ -1,9 +1,7 @@
-// LoginService.java
 package com.Farm.Backend.service.UserService;
 
 import com.Farm.Backend.entity.Users;
-import com.Farm.Backend.repo.LoginRepo;
-import jakarta.persistence.Id;
+import com.Farm.Backend.repo.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +9,10 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     @Autowired
-    private LoginRepo loginRepository;
+    private UsersRepo usersRepo;
 
     public String loginUser(String username, String password) {
-        Users existingUser = loginRepository.findByUsername(username);
+        Users existingUser = usersRepo.findByUsername(username);
         if (existingUser == null) {
             return "User not found!";
         }
@@ -25,12 +23,11 @@ public class LoginService {
         }
     }
 
-    public Users getUserByUsername(String username){
-       return loginRepository.findByUsername(username);
+    public Users getUserByUsername(String username) {
+        return usersRepo.findByUsername(username);
     }
+
     public Users getUserById(Long id) {
-        return loginRepository.findById(Math.toIntExact(id)).orElse(null);
+        return usersRepo.findById(id).orElse(null);
     }
-
-
 }

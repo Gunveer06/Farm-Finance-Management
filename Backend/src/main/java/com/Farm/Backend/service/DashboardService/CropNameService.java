@@ -1,6 +1,5 @@
 package com.Farm.Backend.service.DashboardService;
 
-import com.Farm.Backend.entity.BudgetPlans;
 import com.Farm.Backend.repo.BudgetPlanRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,5 +20,4 @@ public class CropNameService {
             return "No crop found";
         }
     }
-
 }
