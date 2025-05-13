@@ -16,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/")
 public class DashboardController {
+
     @Autowired
     private LoginService loginService;
 
@@ -24,9 +25,23 @@ public class DashboardController {
 
     @GetMapping("/getUserData")
     public ResponseEntity<?> getUserData(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");  // consistent key name
-        if (userId == null) {
+        System.out.println("GETUSERDATA SESSION ID: " + session.getId());
+        System.out.println("Session userId attribute: " + session.getAttribute("userId"));
+
+        Object userIdObj = session.getAttribute("userId");
+
+        if (userIdObj == null) {
             return ResponseEntity.status(401).body("User not logged in");
+        }
+
+        Long userId;
+
+        if (userIdObj instanceof Integer) {
+            userId = ((Integer) userIdObj).longValue();
+        } else if (userIdObj instanceof Long) {
+            userId = (Long) userIdObj;
+        } else {
+            return ResponseEntity.status(401).body("Invalid session userId");
         }
 
         Users user = loginService.getUserById(userId);
@@ -34,7 +49,7 @@ public class DashboardController {
             return ResponseEntity.status(404).body("User not found");
         }
 
-        String cropName = cropNameService.getCropNameByUserId((long) Math.toIntExact(userId)); // change service param to Long if possible
+        String cropName = cropNameService.getCropNameByUserId(userId);
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("username", user.getUsername());
@@ -43,5 +58,3 @@ public class DashboardController {
         return ResponseEntity.ok(userData);
     }
 }
-
-

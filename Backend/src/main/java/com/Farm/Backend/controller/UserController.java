@@ -1,5 +1,6 @@
 package com.Farm.Backend.controller;
 
+import com.Farm.Backend.DTO.LoginRequest;
 import com.Farm.Backend.DTO.RegisterRequest;
 import com.Farm.Backend.entity.Users;
 import com.Farm.Backend.service.UserService.LoginService;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/")
-@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {  // fixed typo
 
     @Autowired
@@ -27,15 +27,20 @@ public class UserController {  // fixed typo
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Users user, HttpSession session) {
-        String result = loginService.loginUser(user);
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
+        System.out.println("Login session ID: " + session.getId() + ", isNew: " + session.isNew());
+        String result = loginService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
 
         if ("Login successful!".equals(result)) {
-            Users existingUser = loginService.getUserByUsername(user.getUsername());
-            session.setAttribute("userId", existingUser.getUserId());  // consistent key name
+            Users existingUser = loginService.getUserByUsername(loginRequest.getUsername());
+            session.setAttribute("userId", existingUser.getUserId());
             session.setAttribute("username", existingUser.getUsername());
+            System.out.println("Login success: userId=" + existingUser.getUserId() + ", sessionId=" + session.getId());
+        } else {
+            System.out.println("Login failed for user: " + loginRequest.getUsername());
         }
 
         return ResponseEntity.ok(result);
     }
+
 }

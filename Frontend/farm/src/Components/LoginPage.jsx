@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Farm icon component
 const FarmIcon = () => (
   <svg viewBox="0 0 24 24" className="w-10 h-10">
     <path
@@ -15,6 +14,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -22,30 +22,35 @@ const LoginPage = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",  // Important!
-        body: JSON.stringify({ username, password }),
-      });
+     const response = await fetch("http://127.0.0.1:8080/api/login", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       credentials: "include",  // Important for session cookies
+       body: JSON.stringify({ username, password }),
+     });
+
+      console.log("Response status:", response.status);
 
       const resultText = await response.text();
-      console.log("Login response:", resultText);
+      console.log("Response body:", resultText);
 
-      if (resultText === "Login successful!") {
+      if (response.ok && resultText === "Login successful!") {
         navigate("/dashboard");
       } else {
-        alert(resultText);
+        alert(resultText || "Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("An error occurred. Please try again.");
+      alert("An error occurred during login. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-green-900 flex flex-col">
@@ -71,6 +76,7 @@ const LoginPage = () => {
               className="w-full p-3 bg-black border border-gray-700 rounded text-white"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -82,14 +88,18 @@ const LoginPage = () => {
               className="w-full p-3 bg-black border border-gray-700 rounded text-white"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
 
           <button
             onClick={handleLogin}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded font-medium"
+            disabled={loading}
+            className={`w-full py-3 rounded font-medium text-white ${
+              loading ? "bg-gray-600 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <div className="mt-6 text-center">
@@ -97,6 +107,7 @@ const LoginPage = () => {
             <button
               onClick={() => navigate("/register")}
               className="text-green-400 hover:text-green-300 cursor-pointer underline"
+              disabled={loading}
             >
               Register
             </button>

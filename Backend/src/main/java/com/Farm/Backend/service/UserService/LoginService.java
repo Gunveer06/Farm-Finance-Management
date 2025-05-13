@@ -13,24 +13,24 @@ public class LoginService {
     @Autowired
     private LoginRepo loginRepository;
 
-    public String loginUser(Users user) {
-        // Find user by username
-        Users existingUser = loginRepository.findByUsername(user.getUsername());
+    public String loginUser(String username, String password) {
+        Users existingUser = loginRepository.findByUsername(username);
         if (existingUser == null) {
             return "User not found!";
         }
-        // Check if user exists and password matches
-
-        else if (  existingUser.getPassword().equals(user.getPassword())) {
+        if (existingUser.getPassword().equals(password)) {
             return "Login successful!";
         } else {
             return "Invalid username or password!";
         }
     }
+
     public Users getUserByUsername(String username){
        return loginRepository.findByUsername(username);
     }
     public Users getUserById(Long id) {
         return loginRepository.findById(Math.toIntExact(id)).orElse(null);
     }
+
+
 }

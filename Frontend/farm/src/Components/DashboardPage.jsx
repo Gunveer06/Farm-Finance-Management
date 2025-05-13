@@ -38,7 +38,7 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/getUserData`, {
+        const response = await axios.get("http://127.0.0.1:8080/api/getUserData", {
           withCredentials: true,
         });
         setUserData(response.data);
