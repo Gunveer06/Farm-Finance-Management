@@ -11,17 +11,21 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
+    "axios": "^1.9.0",
+    "icons": "^1.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-
     "react-icons": "^5.5.0",
-<<<<<<< HEAD
-=======
+
+
+
     "react-router-dom": "^7.5.3",
 
-=======
+
     "recharts": "^2.15.3",
->>>>>>> 002dce3 (done by arunabha)
+
+    "react-router-dom": "^7.5.3",
+
     "tailwindcss": "^4.1.5"
   },
   "devDependencies": {
