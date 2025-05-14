@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import {
   FaDownload,
   FaCalendarAlt,
@@ -11,6 +12,7 @@ import axios from "axios";
 const API_BASE_URL = "http://localhost:8080/api";
 
 const Dashboard = () => {
+  const navigate = useNavigate(); // Initialize navigate
   const [userData, setUserData] = useState({
     username: "",
     cropName: "",
@@ -55,10 +57,12 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    // Clear user session or token here
-    // For example, call logout API or clear cookies/localStorage
-    // Then redirect to login page
     alert("Logout functionality not implemented yet.");
+  };
+
+  // Handler for Budget Planner navigation
+  const handleBudgetPlannerClick = () => {
+    navigate("/BudgetPlanner.jsx");
   };
 
   if (loading) {
@@ -97,7 +101,10 @@ const Dashboard = () => {
             <button className="bg-white text-black w-4/5 py-2 rounded">
               Dashboard
             </button>
-            <button className="hover:underline w-4/5 text-center">
+            <button
+              onClick={handleBudgetPlannerClick}
+              className="hover:underline w-4/5 text-center hover:bg-white hover:text-black transition-colors duration-200 py-2 rounded"
+            >
               Budget Planner
             </button>
             <button className="hover:underline w-4/5 text-center">
