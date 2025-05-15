@@ -8,7 +8,9 @@ import {
 import LoginPage from "./Components/LoginPage";
 import RegisterPage from "./Components/RegisterPage";
 import DashboardPage from "./Components/DashboardPage";
-import BudgetPlanner from "./Components/BudgetPlanner"
+import BudgetPlanner from "./Components/BudgetPlanner";
+import ExpenseTracker from "./Components/ExpenseTracker";
+
 export default function App() {
   return (
     <Router>
@@ -20,7 +22,7 @@ export default function App() {
           {/* You can add a 404 route here if needed */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/budget" element={<BudgetPlanner />} />
-
+          <Route path="/expense-tracker" element={<ExpenseTracker />} />
         </Routes>
       </div>
     </Router>

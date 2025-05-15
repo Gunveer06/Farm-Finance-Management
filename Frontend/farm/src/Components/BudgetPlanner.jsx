@@ -2,13 +2,6 @@ import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Legend } from "recharts";
 import { useNavigate } from "react-router-dom";
 import manager from "../assets/manager.png";
-import axios from "axios";
-
-const API_BASE_URL = "http://127.0.0.1:8080/api"; // Update this if needed
-
-const COLORS = [
-  "#facc15", "#ef4444", "#3b82f6", "#10b981", "#8b5cf6", "#f97316", "#14b8a6"
-];
 
 const BudgetPlanner = () => {
   const navigate = useNavigate();
@@ -22,28 +15,36 @@ const BudgetPlanner = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Fetch budget items on mount
   useEffect(() => {
+    // Fetch budget items from API
     const fetchBudgetItems = async () => {
       try {
-        setLoading(true);
-        // Session-based auth: withCredentials true, no token
-        const response = await axios.get(`${API_BASE_URL}/budget`, {
-          withCredentials: true,
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5100/api/budget", {
+          headers: {
+            "x-auth-token": token,
+          },
         });
-        const data = response.data;
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch budget items");
+        }
+
+        const data = await response.json();
         setBudgetItems(data);
 
         // Calculate remaining budget
         const totalSpent = data.reduce((sum, item) => sum + item.amount, 0);
         setRemainingBudget(totalBudget - totalSpent);
+
+        setLoading(false);
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          navigate("/login");
-        } else {
-          setError("Failed to fetch budget items");
-        }
-      } finally {
+        console.error("Error fetching budget items:", error);
         setLoading(false);
       }
     };
@@ -60,6 +61,7 @@ const BudgetPlanner = () => {
   };
 
   const handleBudgetInputChange = (e) => {
+    // Only allow numbers and decimal points
     const value = e.target.value.replace(/[^0-9.]/g, "");
     setBudgetInput(value);
   };
@@ -69,14 +71,22 @@ const BudgetPlanner = () => {
       setError("Please enter a valid budget amount");
       return;
     }
+
+    // Convert lakhs to rupees (input is in lakhs)
     const newBudget = Math.round(parseFloat(budgetInput) * 100000);
-    const totalAllocated = budgetItems.reduce((sum, item) => sum + item.amount, 0);
+
+    // Check if new budget is less than already allocated amount
+    const totalAllocated = budgetItems.reduce(
+      (sum, item) => sum + item.amount,
+      0
+    );
     if (newBudget < totalAllocated) {
       setError(
         `New budget (₹${newBudget.toLocaleString()}) cannot be less than already allocated amount (₹${totalAllocated.toLocaleString()})`
       );
       return;
     }
+
     setTotalBudget(newBudget);
     setRemainingBudget(newBudget - totalAllocated);
     setShowBudgetModal(false);
@@ -84,31 +94,52 @@ const BudgetPlanner = () => {
   };
 
   const handleAddItem = async () => {
+    // Validate input
     if (!newItem.name.trim() || !newItem.amount) {
       setError("Please enter both name and amount");
       return;
     }
+
     const amountValue = parseInt(newItem.amount, 10);
+
+    // Check if amount exceeds remaining budget
     if (amountValue > remainingBudget) {
       setError(
         `Amount exceeds remaining budget of ₹${remainingBudget.toLocaleString()}`
       );
       return;
     }
+
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${API_BASE_URL}/budget`,
-        { name: newItem.name, amount: amountValue },
-        { withCredentials: true }
-      );
-      const newBudgetItem = response.data;
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5100/api/budget", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token,
+        },
+        body: JSON.stringify({
+          name: newItem.name,
+          amount: amountValue,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add budget item");
+      }
+
+      const newBudgetItem = await response.json();
+
+      // Update state
       setBudgetItems([...budgetItems, newBudgetItem]);
       setRemainingBudget(remainingBudget - amountValue);
       setNewItem({ name: "", amount: "" });
       setShowModal(false);
       setError("");
     } catch (error) {
+      console.error("Error adding budget item:", error);
       setError("Failed to add budget item");
     } finally {
       setLoading(false);
@@ -116,15 +147,27 @@ const BudgetPlanner = () => {
   };
 
   const handleLogout = () => {
-    // Optional: Call backend logout endpoint if you have one
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
-  // Chart data
+  // Prepare chart data
   const chartData = budgetItems.map((item) => ({
     name: item.name,
     value: item.amount,
   }));
+
+  // Use different colors for chart items
+  const COLORS = [
+    "#facc15",
+    "#ef4444",
+    "#3b82f6",
+    "#10b981",
+    "#8b5cf6",
+    "#f97316",
+    "#14b8a6",
+  ];
 
   return (
     <div className="min-h-screen flex font-sans">
@@ -141,6 +184,7 @@ const BudgetPlanner = () => {
             <h2 className="font-bold text-lg">Saroj Vishwas Nadar</h2>
             <p className="text-sm">Farm Manager</p>
           </div>
+
           <nav className="space-y-4 mb-10 w-full flex flex-col items-center">
             <button
               onClick={() => navigate("/dashboard")}
@@ -151,16 +195,24 @@ const BudgetPlanner = () => {
             <button className="bg-white text-black w-4/5 py-2 rounded text-center">
               Budget Planner
             </button>
-            <button className="hover:underline w-4/5 text-center">
+            <button
+              onClick={() => navigate("/expense-tracker")}
+              className="hover:underline w-4/5 text-center"
+            >
               Expense Manager
             </button>
           </nav>
+
           <div className="mb-6 w-full flex justify-center">
-            <button className="hover:underline w-4/5 text-center">
+            <button
+              onClick={() => navigate("/settings")}
+              className="hover:underline w-4/5 text-center"
+            >
               Settings
             </button>
           </div>
         </div>
+
         <button
           onClick={handleLogout}
           className="bg-white text-black py-2 rounded w-4/5 text-center"
@@ -170,7 +222,7 @@ const BudgetPlanner = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 bg-[#12a87b] p-6">
+      <div className="flex-1 bg-[#12a87b] p-6 overflow-auto">
         <div className="flex flex-col lg:flex-row bg-white rounded-2xl shadow-lg p-6 gap-4 max-w-6xl mx-auto">
           {/* Left Chart Section */}
           <div className="flex flex-col w-full lg:w-1/3 gap-4">
@@ -193,7 +245,6 @@ const BudgetPlanner = () => {
                       />
                     ))}
                   </Pie>
-                  <Legend />
                 </PieChart>
               ) : (
                 <div className="w-200 h-200 flex items-center justify-center text-gray-400">
@@ -211,6 +262,7 @@ const BudgetPlanner = () => {
               <div className="text-lg font-semibold text-green-600 mt-2">
                 ₹{(remainingBudget / 100000).toFixed(1)} L Remaining
               </div>
+              {chartData.length > 0 && <Legend />}
             </div>
           </div>
 
@@ -269,11 +321,13 @@ const BudgetPlanner = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-xl font-bold mb-4">Add Budget Item</h2>
+
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 mb-4 rounded">
                 {error}
               </div>
             )}
+
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Item Name
@@ -287,6 +341,7 @@ const BudgetPlanner = () => {
                 placeholder="E.g., Farm Rent"
               />
             </div>
+
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Amount (₹)
@@ -306,6 +361,7 @@ const BudgetPlanner = () => {
                 Remaining budget: ₹{remainingBudget.toLocaleString()}
               </p>
             </div>
+
             <div className="flex justify-end">
               <button
                 onClick={() => {
@@ -334,11 +390,13 @@ const BudgetPlanner = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-xl font-bold mb-4">Update Total Budget</h2>
+
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 mb-4 rounded">
                 {error}
               </div>
             )}
+
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Total Budget (Lakhs)
@@ -362,6 +420,7 @@ const BudgetPlanner = () => {
                 {((totalBudget - remainingBudget) / 100000).toFixed(1)}L
               </p>
             </div>
+
             <div className="flex justify-end">
               <button
                 onClick={() => {
