@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaDownload,
   FaCalendarAlt,
@@ -6,20 +7,12 @@ import {
   FaRulerCombined,
 } from "react-icons/fa";
 import manager from "../assets/manager.png";
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:8080/api";
 
 const Dashboard = () => {
-  const [userData, setUserData] = useState({
-    username: "",
-    cropName: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const crop = {
-    name: userData.cropName || "N/A",
+    name: "Sugarcane",
     duration: "6 months",
     area: "12 hectares",
     marketPrice: "3000rs",
@@ -29,53 +22,26 @@ const Dashboard = () => {
   };
 
   const payments = [
-    { name: "Fertilizer payment", company: "FarmEase Fertilizers", date: "10/05" },
+    {
+      name: "Fertilizer payment",
+      company: "FarmEase Fertilizers",
+      date: "10/05",
+    },
     { name: "Seed purchase", company: "AgroCo", date: "15/05" },
     { name: "Pesticide", company: "GreenShield", date: "22/05" },
   ];
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/getUserData`, {
-          withCredentials: true,
-        });
-        setUserData(response.data);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError("Failed to fetch user data. Please log in again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
+  // Logout function
   const handleLogout = () => {
-    // Clear user session or token here
-    // For example, call logout API or clear cookies/localStorage
-    // Then redirect to login page
-    alert("Logout functionality not implemented yet.");
+    // Remove auth token from localStorage
+    localStorage.removeItem("token");
+
+    // Any other cleanup like removing user data, etc.
+    localStorage.removeItem("user");
+
+    // Redirect to login page
+    navigate("/login");
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen font-sans">
-        <p className="text-xl text-gray-700">Loading dashboard...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen font-sans">
-        <p className="text-xl text-red-600">{error}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen font-sans">
@@ -89,22 +55,30 @@ const Dashboard = () => {
             className="w-28 h-28 rounded-full mb-4"
           />
           <div className="text-center mb-6">
-            <h2 className="font-bold text-lg">{userData.username || "User"}</h2>
+            <h2 className="font-bold text-lg">Saroj Vishwas Nadar</h2>
             <p className="text-sm">Farm Manager</p>
           </div>
 
+          {/* Main Navigation */}
           <nav className="space-y-4 mb-10 w-full flex flex-col items-center">
             <button className="bg-white text-black w-4/5 py-2 rounded">
               Dashboard
             </button>
-            <button className="hover:underline w-4/5 text-center">
+            <button
+              onClick={() => navigate("/budget")}
+              className="hover:underline w-4/5 text-center"
+            >
               Budget Planner
             </button>
-            <button className="hover:underline w-4/5 text-center">
+            <button
+              onClick={() => navigate("/expense-tracker")}
+              className="hover:underline w-4/5 text-center"
+            >
               Expense Manager
             </button>
           </nav>
 
+          {/* Settings placed separately below */}
           <div className="mb-6 w-full flex justify-center">
             <button className="hover:underline w-4/5 text-center">
               Settings
@@ -115,7 +89,6 @@ const Dashboard = () => {
         <button
           onClick={handleLogout}
           className="bg-white text-black py-2 rounded w-4/5 text-center"
-          aria-label="Logout"
         >
           Logout
         </button>
@@ -123,22 +96,28 @@ const Dashboard = () => {
 
       {/* Main Dashboard */}
       <main className="flex-1 bg-green-50 p-6 space-y-6 overflow-y-auto">
+        {/* Header */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">Crop: {crop.name}</h2>
+          <h2 className="text-2xl font-semibold">Crop Name/ Name</h2>
           <div className="bg-black text-white px-4 py-1 rounded">
-            {new Date().toLocaleDateString("en-GB")}
+            6th May, 2025
           </div>
         </div>
 
         {/* Crop Details */}
         <div className="grid grid-cols-3 gap-4">
           <Card icon={<FaLeaf />} label="Crop Name" value={crop.name} />
-          <Card icon={<FaCalendarAlt />} label="Duration" value={crop.duration} />
+          <Card
+            icon={<FaCalendarAlt />}
+            label="Duration"
+            value={crop.duration}
+          />
           <Card icon={<FaRulerCombined />} label="Area" value={crop.area} />
         </div>
 
         {/* Payments + Profit Summary */}
         <div className="grid grid-cols-2 gap-4">
+          {/* Payments */}
           <div className="bg-white shadow p-4 rounded-lg">
             <h3 className="font-bold text-lg mb-4">Upcoming Payments</h3>
             <ul className="space-y-3 text-sm">
@@ -155,6 +134,7 @@ const Dashboard = () => {
             </button>
           </div>
 
+          {/* Profit */}
           <div className="bg-white shadow p-4 rounded-lg">
             <h3 className="font-bold text-lg mb-4">Profit Summary</h3>
             <div className="flex items-center space-x-6">
@@ -164,6 +144,7 @@ const Dashboard = () => {
                   {crop.achieved}%
                 </span>
               </div>
+
               <div>
                 <p>
                   <strong>Current profit:</strong> {crop.currentProfit}
