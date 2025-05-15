@@ -19,17 +19,9 @@ const BudgetPlanner = () => {
     // Fetch budget items from API
     const fetchBudgetItems = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
 
-        const response = await fetch("http://localhost:5100/api/budget", {
-          headers: {
-            "x-auth-token": token,
-          },
-        });
+
+        const response = await fetch("http://localhost:5100/api/budget");
 
         if (!response.ok) {
           throw new Error("Failed to fetch budget items");
@@ -50,7 +42,7 @@ const BudgetPlanner = () => {
     };
 
     fetchBudgetItems();
-  }, [navigate, totalBudget]);
+  }, [totalBudget]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
